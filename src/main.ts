@@ -34,6 +34,16 @@ const handLandmarker = await HandLandmarker.createFromOptions(vision, {
 });
 
 let lastVideoTime = -1;
+const connection: number[][] = [];
+for (let i = 0; i < 20; i++) {
+  if (i % 4 !== 0) {
+    connection.push([i, i + 1]);
+  } else {
+    if (i < 4 || 16 < i) continue;
+    connection.push([i + 1, i + 5]);
+  }
+}
+connection.push([0, 1], [0, 5], [0, 17]);
 function renderLoop() {
   if (video.currentTime !== lastVideoTime) {
     const results = handLandmarker.detectForVideo(video, video.currentTime);
@@ -46,7 +56,6 @@ function renderLoop() {
     if (results.landmarks.length > 0) {
       for (const landmarks of results.landmarks) {
         console.log(landmarks);
-
         for (const landmark of landmarks) {
           ctx.fillStyle = "#0000ff";
           ctx.fillRect(
@@ -55,6 +64,21 @@ function renderLoop() {
             10,
             10
           );
+        }
+        for (let i = 0; i < connection.length; i++) {
+          console.log(connection[i][0], connection[i][1]);
+          ctx.beginPath();
+          if (landmarks[connection[i][0]] && landmarks[connection[i][1]]) {
+            ctx.moveTo(
+              landmarks[connection[i][0]].x * canvas.width,
+              landmarks[connection[i][0]].y * canvas.height
+            );
+            ctx.lineTo(
+              landmarks[connection[i][1]].x * canvas.width,
+              landmarks[connection[i][1]].y * canvas.height
+            );
+            ctx.stroke();
+          }
         }
       }
     }
