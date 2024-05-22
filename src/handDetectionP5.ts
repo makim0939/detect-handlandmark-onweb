@@ -32,7 +32,7 @@ export const sketch = (p: p5) => {
   };
   const draw = () => {
     if (!handLandmarker || !video.srcObject) return;
-
+    if (!video.videoWidth || !video.videoWidth) return;
     if (video.currentTime === lastVideoTime) return;
     // p.background(0);
     p.push();
@@ -41,11 +41,10 @@ export const sketch = (p: p5) => {
     p.displayWidth = p.width;
     p.displayHeight = (p.width * capture.height) / capture.width;
     p.image(capture, 0, 0, p.displayWidth, p.displayHeight);
+
     const results = handLandmarker.detectForVideo(video, video.currentTime);
     lastVideoTime = video.currentTime;
     if (results.landmarks.length > 0) {
-      console.log(results.landmarks);
-
       if (results.landmarks.length > 1) {
         p.beginShape();
         p.noFill();
