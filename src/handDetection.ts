@@ -47,12 +47,12 @@ export const handDetection = async (
             HandLandmarker.HAND_CONNECTIONS,
             {
               color: "#00FF00",
-              lineWidth: 5,
+              lineWidth: 3,
             }
           );
           drawingUtils.drawLandmarks(landmarks, {
             color: "#FF0000",
-            lineWidth: 2,
+            radius: 2,
           });
         }
       }

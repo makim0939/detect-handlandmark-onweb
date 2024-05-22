@@ -24,41 +24,69 @@ export const sketch = (p: p5) => {
 
     const canvas = p.createCanvas(640, 480);
     capture = p.createCapture("video");
+    capture.size(640, 480);
     const app = document.querySelector<HTMLDivElement>("#app")!;
     canvas.parent(app);
     video = capture.elt;
-    video.style.display = "none";
+    capture.hide();
   };
   const draw = () => {
     if (!handLandmarker || !video.srcObject) return;
 
-    p.background(0);
+    if (video.currentTime === lastVideoTime) return;
+    // p.background(0);
     p.push();
     p.translate(p.width, 0);
     p.scale(-1, 1);
     p.displayWidth = p.width;
     p.displayHeight = (p.width * capture.height) / capture.width;
     p.image(capture, 0, 0, p.displayWidth, p.displayHeight);
+    const results = handLandmarker.detectForVideo(video, video.currentTime);
+    lastVideoTime = video.currentTime;
+    if (results.landmarks.length > 0) {
+      console.log(results.landmarks);
 
-    if (video.currentTime !== lastVideoTime) {
-      const results = handLandmarker.detectForVideo(video, video.currentTime);
-      lastVideoTime = video.currentTime;
-      if (results.landmarks.length > 0) {
-        p.fill(0, 0, 255);
-        p.noStroke();
-        for (const landmarks of results.landmarks) {
-          for (let i = 0; i < landmarks.length; i++) {
-            p.ellipse(
-              landmarks[i].x * p.displayWidth,
-              landmarks[i].y * p.displayHeight,
-              10,
-              10
-            );
-          }
+      if (results.landmarks.length > 1) {
+        p.beginShape();
+        p.noFill();
+        p.stroke(255);
+        p.strokeWeight(3);
+        p.vertex(
+          results.landmarks[0][8].x * p.displayWidth,
+          results.landmarks[0][8].y * p.displayHeight
+        );
+        p.vertex(
+          results.landmarks[1][8].x * p.displayWidth,
+          results.landmarks[1][8].y * p.displayHeight
+        );
+        p.vertex(
+          results.landmarks[1][4].x * p.displayWidth,
+          results.landmarks[1][4].y * p.displayHeight
+        );
+        p.vertex(
+          results.landmarks[0][4].x * p.displayWidth,
+          results.landmarks[0][4].y * p.displayHeight
+        );
+        p.vertex(
+          results.landmarks[0][8].x * p.displayWidth,
+          results.landmarks[0][8].y * p.displayHeight
+        );
+        p.endShape();
+      }
+      for (const landmarks of results.landmarks) {
+        for (let i = 0; i < landmarks.length; i++) {
+          p.fill(255, 0, 0);
+          p.noStroke();
+          p.ellipse(
+            landmarks[i].x * p.displayWidth,
+            landmarks[i].y * p.displayHeight,
+            10,
+            10
+          );
         }
       }
+      p.pop();
     }
-    p.pop();
   };
 
   p.setup = setup;
