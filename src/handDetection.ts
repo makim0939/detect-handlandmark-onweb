@@ -16,6 +16,8 @@ export const handDetection = async (
     const handLandmarker = await HandLandmarker.createFromOptions(vision, {
       baseOptions: {
         modelAssetPath: "../hand_landmarker.task",
+        //CPUだと若干重くなりました。
+        // delegate: "CPU",
         delegate: "GPU",
       },
       runningMode: "VIDEO",
